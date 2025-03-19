@@ -1,4 +1,4 @@
-[Test Game](http://htmlpreview.github.io/?https://github.com/koiifshd/houyi/blob/main/index.html)
+[RUN GAME LINK](http://htmlpreview.github.io/?https://github.com/koiifshd/houyi/blob/main/index.html)
 
 
 Guidelines:
