@@ -7,3 +7,6 @@ Space Bar for a "higher/double jump"
 
 For the Shooting Sun Game, the Bow tracks your cursor movement and will follow it. 
 Hold down to shoot!
+
+
+Stage 3 Hint: "together"
