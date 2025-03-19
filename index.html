@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=2.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="Houyi: The Ten Suns">
+  <title>Houyi: The Ten Suns</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #000;
+    }
+    canvas {
+      border: 1px solid #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <script src="game.js"></script>
+  <script>
+    const game = new Game('gameCanvas');
+    game.init();
+  </script>
+</body>
+</html>
