@@ -31,7 +31,6 @@ const gameAssets = {
   audio: {}
 };
 
-// Sun data, REMOVE AFTER DONE TESTING
 const sunData = [
   {
     name: "Pride",
@@ -394,7 +393,7 @@ class IntroScene extends Scene {
   }
 
   setup() {
-    // Setup frames (placeholder implementation)
+
     this.introText.forEach((text, index) => {
       this.frames.push({
         text,
@@ -508,11 +507,8 @@ class GameScene extends Scene {
   }
 
   createBackgroundLayers(environmentType) {
-    // This would normally load various parallax background layers
-    // For now, just return a simple background based on environment type
     const layers = [];
     
-    // Get the current level's background image
     const currentLevel = this.currentStage;
     const bgImage = gameAssets.sprites[`bg_level_${currentLevel}`];
     
@@ -601,7 +597,7 @@ class GameScene extends Scene {
         platforms.push(new Platform(650, 250, 100, 20)); // Decoy - too high
         platforms.push(new Platform(850, 150, 100, 20)); // Decoy - too high
         
-        // Place the arrow collectible above the last real platform
+        //idk what happened i forgot
         const lastPlatform = platforms[4]; // The last real platform
         const arrowX = lastPlatform.x + lastPlatform.width / 2 - 15;
         const arrowY = lastPlatform.y - 50;
@@ -629,7 +625,6 @@ class GameScene extends Scene {
         platforms.push(new Platform(800, 300, 150, 30));
     }
 
-    // Ensure platforms are spaced to allow jumps based on physics
     for (let i = 1; i < platforms.length; i++) {
       const prev = platforms[i - 1];
       const curr = platforms[i];
@@ -638,8 +633,8 @@ class GameScene extends Scene {
 
       if (curr.y - prev.y > maxJumpHeight || Math.abs(curr.x - prev.x) > maxJumpDistance) {
         console.warn("Platform placement exceeds jump physics limits. Adjusting...");
-        curr.y = prev.y - maxJumpHeight + 50; // Adjust height to be reachable
-        curr.x = prev.x + Math.min(maxJumpDistance, curr.x - prev.x); // Adjust horizontal distance
+        curr.y = prev.y - maxJumpHeight + 50; //
+        curr.x = prev.x + Math.min(maxJumpDistance, curr.x - prev.x); 
       }
     }
 
@@ -668,13 +663,13 @@ class GameScene extends Scene {
           gameState.collectedArrows.push(collectible.arrowType);
           this.game.soundManager.playSfx('collect_arrow');
           
-          // Check if it's a special arrow that grants ability
+          // check if it's a special arrow that grants ability
           const currentStageData = sunData[this.currentStage - 1];
           if (currentStageData.rewardAbility) {
             gameState.abilities[currentStageData.rewardAbility] = true;
           }
           
-          // Switch to archery scene to shoot the sun
+          // switch to archery scene to shoot the sun
           this.game.changeScene('archery');
         }
         
