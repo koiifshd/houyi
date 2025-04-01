@@ -1,4 +1,4 @@
-// constants
+// Constants
 const GAME_WIDTH = 1280;
 const GAME_HEIGHT = 720;
 const GRAVITY = 0.5;
@@ -13,7 +13,7 @@ let gameState = {
   currentSun: null,
   environment: "scorched",
   collectedArrows: [],
-  playerChoices: [], //moreal choices
+  playerChoices: [], // Track moral choices for ending determination
   abilities: {
     doubleJump: false,
     timeSlowAbility: false
@@ -31,8 +31,97 @@ const gameAssets = {
   audio: {}
 };
 
+// Sun data, REMOVE AFTER DONE TESTING
+const sunData = [
+  {
+    name: "Pride",
+    personality: "Arrogant and dismissive",
+    environment: "barren wasteland",
+    dialogues: ["My brilliance... extinguished by a mere mortal? Perhaps... we were never meant to rule over all we touched."],
+    arrowName: "Arrow of Humility",
+    platformStyle: "simple",
+    specialChallenge: "basic aiming",
+  },
+  {
+    name: "Greed",
+    personality: "Greedy, possessive",
+    environment: "scorched ruins of wealthy city",
+    dialogues: ["My endless hunger leaves me... with nothing in the end. All I claimed... returns to dust... just as your gleaming treasures will."],
+    arrowName: "Arrow of Sacrifice",
+    platformStyle: "unstable wealth",
+    specialChallenge: "moving platforms",
+  },
+  {
+    name: "Unity & Division",
+    personality: "Twin suns, interdependent",
+    environment: "split-level light and dark design",
+    dialogues: ["Apart, we fall... together, we might have found balance. Remember archer... what divides you ... will ultimately consume you."],
+    arrowName: "Arrows of Balance",
+    platformStyle: "upward movement, dual sides",
+    specialChallenge: "hit both suns in sequence",
+    rewardAbility: "doubleJump"
+  },
+  {
+    name: "Denial",
+    personality: "Denies damage caused",
+    environment: "partially recovered landscapes with burning areas",
+    dialogues: ["*whimpers* \"I see it now... too late... the truth I refused to face... reality endures even when we look away.\""],
+    arrowName: "Arrow of Truth",
+    platformStyle: "double jump challenges",
+    specialChallenge: "deceptive platforms",
+  },
+  {
+    name: "Anger",
+    personality: "Volatile, aggressive",
+    environment: "unstable terrain with erupting geysers",
+    dialogues: ["My flames... extinguished. But beware, archer... righteous fury has its place... inaction... is as destructive as my heat."],
+    arrowName: "Arrow of Patience",
+    platformStyle: "time-limited platforms",
+    specialChallenge: "time slow ability",
+    environmentChange: "human settlements visible in distance",
+    rewardAbility: "timeSlowAbility"
+  },
+  {
+    name: "Deception",
+    personality: "Trickster, creates illusions",
+    environment: "maze-like forests with false paths",
+    dialogues: ["My illusions fade... but others will rise. Truth requires... constant vigilance... how many more lies... will you allow to flourish?"],
+    arrowName: "Arrow of Insight",
+    platformStyle: "discerning real paths from illusions",
+    specialChallenge: "multiple sun images but only one is real",
+  },
+  {
+    name: "Chaos",
+    personality: "Disruptive, constantly changing",
+    environment: "floating islands with shifting gravity",
+    dialogues: ["Even in my defeat... new patterns emerge. The world... will never return... to what it was. Adapt to what comes... or follow me into oblivion."],
+    arrowName: "Arrow of Stability",
+    platformStyle: "gravity shifts direction periodically",
+    specialChallenge: "shooting while gravity shifts",
+  },
+  {
+    name: "Fear",
+    personality: "Paranoid, hides in darkness",
+    environment: "dark caverns with minimal visibility",
+    dialogues: ["The darkness I cast... was nothing... compared to the shadows... you cast upon your own future. Face what comes... with open eyes."],
+    arrowName: "Arrow of Courage",
+    platformStyle: "navigate using limited light sources",
+    specialChallenge: "listen for sun's movements",
 
- Classes
+  },
+  {
+    name: "Sorrow",
+    personality: "Youngest sun, regretful",
+    environment: "beautiful but fragile crystal landscape",
+    dialogues: ["I never wished for this power... I only wanted to shine upon this Earth."],
+    arrowName: "Arrow of Mercy",
+    platformStyle: "most challenging, all previous mechanics",
+    specialChallenge: "moral choice - wound rather than destroy",
+  
+  }
+];
+
+// Classes
 class Game {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
@@ -41,7 +130,7 @@ class Game {
     this.canvas.height = GAME_HEIGHT;
     this.lastTime = 0;
     this.accumulator = 0;
-    this.timeStep = 1000 / 60;  60 FPS
+    this.timeStep = 1000 / 60; // 60 FPS
     this.scenes = {
       intro: new IntroScene(this),
       game: new GameScene(this),
@@ -165,7 +254,7 @@ class AssetLoader {
     this.imagesToLoad = [
       { id: 'player', src: 'assets/images/sprites/player.png' },
       { id: 'background_scorched', src: 'assets/images/scorched.png' },
-       Sun sprites
+      // Sun sprites
       { id: 'pride', src: 'assets/images/sprites/suns/pride.png' },
       { id: 'greed', src: 'assets/images/sprites/suns/greed.png' },
       { id: 'unity', src: 'assets/images/sprites/suns/unity.png' },
@@ -176,7 +265,7 @@ class AssetLoader {
       { id: 'chaos', src: 'assets/images/sprites/suns/chaos.png' },
       { id: 'fear', src: 'assets/images/sprites/suns/fear.png' },
       { id: 'sorrow', src: 'assets/images/sprites/suns/sorrow.png' },
-       Level backgrounds
+      // Level backgrounds
       { id: 'bg_level_1', src: 'assets/images/backgrounds/level1.jpg' },
       { id: 'bg_level_2', src: 'assets/images/backgrounds/level2.jpg' },
       { id: 'bg_level_3', src: 'assets/images/backgrounds/level3.jpg' },
@@ -206,7 +295,7 @@ class AssetLoader {
         };
         image.onerror = () => {
           console.error(`Failed to load image: ${img.src}`);
-           Fall back to a placeholder for development
+          // Fall back to a placeholder for development
           image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
           gameAssets.sprites[img.id] = image;
           resolve();
@@ -276,7 +365,7 @@ class SoundManager {
   }
 }
 
- Scene classes
+// Scene classes
 class Scene {
   constructor(game) {
     this.game = game;
@@ -293,7 +382,7 @@ class IntroScene extends Scene {
     super(game);
     this.frames = [];
     this.currentFrame = 0;
-    this.frameDelay = 2000;  3 seconds per frame
+    this.frameDelay = 2000; // 3 seconds per frame
     this.timer = 0;
     this.introText = [
       "The TEN SONS transform into suns, filling the sky",
@@ -305,16 +394,16 @@ class IntroScene extends Scene {
   }
 
   setup() {
-     Setup frames (placeholder implementation)
+    // Setup frames (placeholder implementation)
     this.introText.forEach((text, index) => {
       this.frames.push({
         text,
         render: (ctx) => {
-           Draw background
+          // Draw background
           ctx.fillStyle = 'black';
           ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
           
-           Draw text
+          // Draw text
           ctx.fillStyle = 'white';
           ctx.font = '24px Arial';
           ctx.textAlign = 'center';
@@ -342,7 +431,7 @@ class IntroScene extends Scene {
       }
     }
     
-     Skip intro if any key is pressed
+    // Skip intro if any key is pressed
     if (Object.values(this.game.input.keys).some(key => key)) {
       this.game.changeScene('game');
     }
@@ -368,7 +457,7 @@ class GameScene extends Scene {
 
   setup() {
     this.player = new Player(100, 300);
-    this.loadStage(1);  Start with stage 1 (Pride)
+    this.loadStage(1); // Start with stage 1 (Pride)
   }
 
   enter() {
@@ -381,7 +470,7 @@ class GameScene extends Scene {
     
     this.currentStage = stageNumber;
     
-     Clear previous stage elements
+    // Clear previous stage elements
     this.platforms = [];
     this.collectibles = [];
     this.enemies = [];
@@ -389,39 +478,41 @@ class GameScene extends Scene {
     const stageData = sunData[stageNumber - 1];
     gameState.currentSun = stageData;
     
-     Setting up environment
+    // Setting up environment based on stage data
     this.backgroundLayers = this.createBackgroundLayers(stageData.environment);
     
-     Create platforms
+    // Create platforms based on stage difficulty and style
     this.platforms = this.generatePlatforms(stageData.platformStyle);
     
-     Place the arrow collectible above the last reachable platform
+    // Place the arrow collectible above the last reachable platform
     const lastPlatform = this.platforms[this.platforms.length - 1];
-    const arrowX = lastPlatform.x + lastPlatform.width / 2 - 15;  Centered on the platform
-    const arrowY = lastPlatform.y - 50;  Slightly above the platform
+    const arrowX = lastPlatform.x + lastPlatform.width / 2 - 15; // Centered on the platform
+    const arrowY = lastPlatform.y - 50; // Slightly above the platform
     this.collectibles.push(new Arrow(arrowX, arrowY, stageData.arrowName, stageNumber));
     
-     Create sun enemy
+    // Create sun enemy
     if (stageData.name === "Unity & Division") {
-       Special bc twin suns
-      this.enemies.push(new Sun(GAME_WIDTH - 150, 150, 3, "left"));  
-      this.enemies.push(new Sun(GAME_WIDTH - 50, 150, 3, "right"));  
+      // Special case for twin suns
+      this.enemies.push(new Sun(GAME_WIDTH - 150, 150, 3, "left"));  // Always use 3 for Unity & Division
+      this.enemies.push(new Sun(GAME_WIDTH - 50, 150, 3, "right"));  // Always use 3 for Unity & Division
     } else {
       this.enemies.push(new Sun(GAME_WIDTH - 100, 150, stageNumber));
     }
     
+    // Adjust player spawn position to avoid spawning under the first platform
     this.player.x = 100;
-    this.player.y = GAME_HEIGHT - 150;  Spawn above the ground
+    this.player.y = GAME_HEIGHT - 150; // Spawn above the ground
     
-     Update game state
+    // Update game state
     gameState.stage = stageNumber;
   }
 
   createBackgroundLayers(environmentType) {
-
+    // This would normally load various parallax background layers
+    // For now, just return a simple background based on environment type
     const layers = [];
     
-
+    // Get the current level's background image
     const currentLevel = this.currentStage;
     const bgImage = gameAssets.sprites[`bg_level_${currentLevel}`];
     
@@ -433,7 +524,7 @@ class GameScene extends Scene {
         y: 0
       });
     } else {
-    
+      // Fallback to default background if image not found
       console.warn(`Background image for level ${currentLevel} not found, using fallback`);
       layers.push({
         image: gameAssets.sprites.background_scorched,
@@ -449,34 +540,34 @@ class GameScene extends Scene {
   generatePlatforms(platformStyle) {
     const platforms = [];
 
-     Base platform (ground)
+    // Base platform (ground)
     platforms.push(new Platform(0, GAME_HEIGHT - 50, GAME_WIDTH, 50));
 
-     Add platforms based on the style
+    // Add platforms based on the style
     switch (platformStyle) {
       case "simple":
-         Easy platforms for early levels
+        // Easy platforms for early levels
         platforms.push(new Platform(200, 600, 200, 30));
         platforms.push(new Platform(450, 500, 200, 30));
         platforms.push(new Platform(700, 400, 200, 30));
         platforms.push(new Platform(950, 300, 200, 30));
         break;
       case "unstable wealth":
-         Introduce moving platforms
+        // Introduce moving platforms
         platforms.push(new MovingPlatform(200, 600, 150, 30, 200, 400, 1));
         platforms.push(new MovingPlatform(500, 500, 150, 30, 500, 350, 1.5));
         platforms.push(new MovingPlatform(800, 400, 150, 30, 800, 250, 2));
         break;
       case "upward movement, dual sides":
-         Smaller platforms with larger gaps
-        platforms.push(new Platform(100, 600, 120, 20));  Left side
+        // Smaller platforms with larger gaps
+        platforms.push(new Platform(100, 600, 120, 20)); // Left side
         platforms.push(new Platform(300, 520, 120, 20));
         platforms.push(new Platform(500, 440, 120, 20));
-        platforms.push(new Platform(700, 360, 120, 20));  Right side
+        platforms.push(new Platform(700, 360, 120, 20)); // Right side
         platforms.push(new Platform(900, 280, 120, 20));
         break;
       case "double jump challenges":
-         Platforms requiring double jump ability
+        // Platforms requiring double jump ability
         platforms.push(new Platform(200, 600, 100, 20));
         platforms.push(new Platform(400, 500, 100, 20));
         platforms.push(new Platform(600, 400, 100, 20));
@@ -484,46 +575,46 @@ class GameScene extends Scene {
         platforms.push(new Platform(1000, 200, 100, 20));
         break;
       case "time-limited platforms":
-         Moving platforms with tight timing
+        // Moving platforms with tight timing
         platforms.push(new MovingPlatform(200, 600, 100, 20, 200, 400, 1.5));
         platforms.push(new MovingPlatform(500, 500, 100, 20, 500, 350, 2));
         platforms.push(new MovingPlatform(800, 400, 100, 20, 800, 250, 2.5));
         break;
       case "discerning real paths from illusions":
-         Adjusted platform layout for stage 6
-         Create a clear path with some decoy platforms
-        platforms.push(new Platform(200, 600, 150, 30)); 
-        platforms.push(new Platform(400, 500, 150, 30)); 
-        platforms.push(new Platform(600, 400, 150, 30)); 
-        platforms.push(new Platform(800, 300, 150, 30)); 
-        platforms.push(new Platform(1000, 200, 150, 30)); 
+        // Adjusted platform layout for stage 6
+        // Create a clear path with some decoy platforms
+        platforms.push(new Platform(200, 600, 150, 30)); // Real platform
+        platforms.push(new Platform(400, 500, 150, 30)); // Real platform
+        platforms.push(new Platform(600, 400, 150, 30)); // Real platform
+        platforms.push(new Platform(800, 300, 150, 30)); // Real platform
+        platforms.push(new Platform(1000, 200, 150, 30)); // Real platform
         
-         Add some decoy platforms that look tempting but are too far to reach
-        platforms.push(new Platform(300, 550, 100, 20)); 
-        platforms.push(new Platform(500, 450, 100, 20)); 
-        platforms.push(new Platform(700, 350, 100, 20)); 
-        platforms.push(new Platform(900, 250, 100, 20)); 
+        // Add some decoy platforms that look tempting but are too far to reach
+        platforms.push(new Platform(300, 550, 100, 20)); // Decoy - too far right
+        platforms.push(new Platform(500, 450, 100, 20)); // Decoy - too far right
+        platforms.push(new Platform(700, 350, 100, 20)); // Decoy - too far right
+        platforms.push(new Platform(900, 250, 100, 20)); // Decoy - too far right
         
-         Add some decoy platforms that look reachable but are too high
-        platforms.push(new Platform(250, 450, 100, 20)); 
-        platforms.push(new Platform(450, 350, 100, 20)); 
-        platforms.push(new Platform(650, 250, 100, 20)); 
-        platforms.push(new Platform(850, 150, 100, 20)); 
+        // Add some decoy platforms that look reachable but are too high
+        platforms.push(new Platform(250, 450, 100, 20)); // Decoy - too high
+        platforms.push(new Platform(450, 350, 100, 20)); // Decoy - too high
+        platforms.push(new Platform(650, 250, 100, 20)); // Decoy - too high
+        platforms.push(new Platform(850, 150, 100, 20)); // Decoy - too high
         
-         Place the arrow collectible above the last real platform
-        const lastPlatform = platforms[4]; 
+        // Place the arrow collectible above the last real platform
+        const lastPlatform = platforms[4]; // The last real platform
         const arrowX = lastPlatform.x + lastPlatform.width / 2 - 15;
         const arrowY = lastPlatform.y - 50;
         this.collectibles.push(new Arrow(arrowX, arrowY, "Arrow of Insight", 6));
         break;
       case "gravity shifts direction periodically":
-         Platforms with shifting gravity
+        // Platforms with shifting gravity
         platforms.push(new MovingPlatform(200, 600, 100, 20, 200, 400, 1.5));
         platforms.push(new MovingPlatform(500, 500, 100, 20, 500, 350, 2));
         platforms.push(new MovingPlatform(800, 400, 100, 20, 800, 250, 2.5));
         break;
       case "most challenging, all previous mechanics":
-         Combine all mechanics for the final stage
+        // Combine all mechanics for the final stage
         platforms.push(new MovingPlatform(200, 600, 80, 20, 200, 400, 2));
         platforms.push(new MovingPlatform(400, 500, 80, 20, 400, 300, 2.5));
         platforms.push(new Platform(600, 400, 80, 20));
@@ -531,14 +622,14 @@ class GameScene extends Scene {
         platforms.push(new Platform(1000, 200, 80, 20));
         break;
       default:
-         Default fallback
+        // Default fallback
         platforms.push(new Platform(200, 600, 150, 30));
         platforms.push(new Platform(400, 500, 150, 30));
         platforms.push(new Platform(600, 400, 150, 30));
         platforms.push(new Platform(800, 300, 150, 30));
     }
 
-     Ensure platforms are spaced to allow jumps based on physics
+    // Ensure platforms are spaced to allow jumps based on physics
     for (let i = 1; i < platforms.length; i++) {
       const prev = platforms[i - 1];
       const curr = platforms[i];
@@ -547,8 +638,8 @@ class GameScene extends Scene {
 
       if (curr.y - prev.y > maxJumpHeight || Math.abs(curr.x - prev.x) > maxJumpDistance) {
         console.warn("Platform placement exceeds jump physics limits. Adjusting...");
-        curr.y = prev.y - maxJumpHeight + 50;  Adjust height to be reachable
-        curr.x = prev.x + Math.min(maxJumpDistance, curr.x - prev.x);  Adjust horizontal distance
+        curr.y = prev.y - maxJumpHeight + 50; // Adjust height to be reachable
+        curr.x = prev.x + Math.min(maxJumpDistance, curr.x - prev.x); // Adjust horizontal distance
       }
     }
 
@@ -556,34 +647,34 @@ class GameScene extends Scene {
   }
 
   update(deltaTime) {
-     Update player
+    // Update player
     this.player.update(deltaTime, this.platforms, this.game.input);
     
-     Update camera
+    // Update camera
     this.game.camera.follow(this.player);
     this.game.camera.update();
     
-     Update platforms
+    // Update platforms
     this.platforms.forEach(platform => platform.update(deltaTime));
     
-     Update collectibles and check collection
+    // Update collectibles and check collection
     for (let i = this.collectibles.length - 1; i >= 0; i--) {
       const collectible = this.collectibles[i];
       collectible.update(deltaTime);
       
       if (this.checkCollision(this.player, collectible)) {
         if (collectible instanceof Arrow) {
-           Collect arrow
+          // Collect arrow
           gameState.collectedArrows.push(collectible.arrowType);
           this.game.soundManager.playSfx('collect_arrow');
           
-           Check if it's a special arrow that grants ability
+          // Check if it's a special arrow that grants ability
           const currentStageData = sunData[this.currentStage - 1];
           if (currentStageData.rewardAbility) {
             gameState.abilities[currentStageData.rewardAbility] = true;
           }
           
-           Switch to archery scene to shoot the sun
+          // Switch to archery scene to shoot the sun
           this.game.changeScene('archery');
         }
         
@@ -591,16 +682,16 @@ class GameScene extends Scene {
       }
     }
     
-     Update enemies
+    // Update enemies
     this.enemies.forEach(enemy => enemy.update(deltaTime));
   }
 
   render(ctx) {
-     Apply camera transform
+    // Apply camera transform
     ctx.save();
     ctx.translate(-this.game.camera.x, -this.game.camera.y);
     
-     Render background layers (parallax)
+    // Render background layers (parallax)
     this.backgroundLayers.forEach(layer => {
       ctx.drawImage(
         layer.image, 
@@ -611,26 +702,26 @@ class GameScene extends Scene {
       );
     });
     
-     Render platforms
+    // Render platforms
     this.platforms.forEach(platform => platform.render(ctx));
     
-     Render collectibles
+    // Render collectibles
     this.collectibles.forEach(collectible => collectible.render(ctx));
     
-     Render enemies
+    // Render enemies
     this.enemies.forEach(enemy => enemy.render(ctx));
     
-     Render player
+    // Render player
     this.player.render(ctx);
     
     ctx.restore();
     
-     UI elements (not affected by camera)
+    // UI elements (not affected by camera)
     this.renderUI(ctx);
   }
 
   renderUI(ctx) {
-     Display current stage
+    // Display current stage
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
     ctx.textAlign = 'left';
@@ -1429,7 +1520,7 @@ class Player extends Entity {
     if (this.sprite) {
       ctx.save();
       
-      // Calculate dimensions  (aspect ratio)
+      // Calculate dimensions maintaining aspect ratio
       const scaledWidth = 30 * this.spriteScale;
       const scaledHeight = 28 * this.spriteScale;
       
@@ -1787,6 +1878,7 @@ class Sun extends Entity {
         this.height
       );
       
+      // Draw rays
       ctx.strokeStyle = 'rgba(255, 200, 0, 0.3)';
       ctx.lineWidth = 2;
       this.rays.forEach(ray => {
@@ -1801,6 +1893,7 @@ class Sun extends Entity {
       
       ctx.restore();
     } else {
+      // Fallback rendering if sprite not loaded
       ctx.fillStyle = 'red';
       ctx.fillRect(this.x, this.y, this.width, this.height);
     }
